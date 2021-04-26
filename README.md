@@ -19,12 +19,16 @@ Algorithm steps:
 3. Filter products with Gaussian window
 
 4. For each pixel (i,j) define the matrix 
-  M = [ m11(i,j)   m12(i,j)
+  
+        M = [ m11(i,j)   m12(i,j)
+  
         m21(i,j)   m22(i,j) ]
         
 5. For each pixel compute the score R
-   R = det(M) - a[tr(M)]^2
-   a~0.06
+   
+        R = det(M) - a[tr(M)]^2
+   
+        a~0.06
    
 6. Threshold R and perform NMS (Non-maxima suppression)
 
@@ -33,7 +37,9 @@ Algorithm steps:
 The algorithm is wrapped in PySimpleGUI User Interface:
 
 1. Load image from OS
+
 2. Choose sensetivity (low, medium, high) of the algorithm
+
 3. Click "show corners" to present the algorithm output on the selected image
 
 --------------------------------------------------------------------------------------------------
