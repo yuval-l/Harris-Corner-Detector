@@ -20,9 +20,9 @@ Algorithm steps:
 
 4. For each pixel (i,j) define the matrix 
   
-        M = [ m11(i,j)   m12(i,j)
-  
-        m21(i,j)   m22(i,j) ]
+            [ m11(i,j)   m12(i,j)
+        M =
+              m21(i,j)   m22(i,j) ]
         
 5. For each pixel compute the score R
    
