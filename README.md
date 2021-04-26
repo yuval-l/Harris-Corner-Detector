@@ -1,6 +1,6 @@
 # Harris Corner Detector
 
---------------------------------------------------------------------------------------------------
+
 
 **HIT | Algorithms in Multimedia and machine learning in Python enviorment**
 
