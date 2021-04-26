@@ -3,7 +3,9 @@ Harris Corner Detector
 --------------------------------------------------------------------------------------------------
 
 HIT | Algorithms in Multimedia and machine learning in Python enviorment
+
 Yuval Levi & Ortal Michael
+
 May 2021
 
 --------------------------------------------------------------------------------------------------
