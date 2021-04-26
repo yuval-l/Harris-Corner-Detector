@@ -14,7 +14,7 @@ Algorithm steps:
 
 1. Compute image gradients: Gx, Gy
 
-2. Compute products: Gx*Gx, Gy*Gy, Gx*Gy
+2. Compute products: Gx\*Gx, Gy\*Gy, Gx\*Gy
 
 3. Filter products with Gaussian window
 
