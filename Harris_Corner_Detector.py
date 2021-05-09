@@ -95,22 +95,24 @@ def main(img, **params):
 
 if __name__ == '__main__':
     sg.theme('DarkBlue3')
+    sg.theme('Light Grey 1')
     chosen_th = None
 
     low_sen_params = {
         'r_threshold': 0.1,
-        'k_nms': 7
+        'k_nms': 3
     }
     medium_sen_params = {
         'r_threshold': 0.05,
-        'k_nms': 5
+        'k_nms': 9
     }
     high_sen_params = {
-        'r_threshold': 0.005,
-        'k_nms': 3
+        'r_threshold': 0.001,
+        'k_nms': 13
     }
 
-    file_list_column = [
+    control_column = [
+        [sg.Text("Harris Corner Detector Simulator", size=(30,2), font=("Open Sans Bold", 18), text_color='dark blue')],
         [
             sg.Text("Choose image:"),
             sg.In(size=(25, 1), enable_events=True, key="-FOLDER-"),
@@ -129,13 +131,14 @@ if __name__ == '__main__':
     ]
 
     image_viewer_column = [
-        [sg.Text(size=(40, 1), key="-TOUT-")],
+        [sg.Text("Image Viewer", size=(30, 2), font=("Open Sans Bold", 12), text_color='dark blue')],
+        [sg.Text(size=(50, 1), key="-TOUT-")],
         [sg.Image(key="-IMAGE-")],
     ]
 
     layout = [
         [
-            sg.Column(file_list_column),
+            sg.Column(control_column),
             sg.VSeperator(),
             sg.Column(image_viewer_column),
         ],
