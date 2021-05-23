@@ -10,6 +10,16 @@ May 2021
 
 --------------------------------------------------------------------------------------------------
 
+**Prerequisite**
+
+Install required packages:
+
+pip install -r requirements.txt
+
+* OpenCV and Anaconda packages are also required
+
+--------------------------------------------------------------------------------------------------
+
 Algorithm steps:
 
 1. Compute image gradients: Gx, Gy
