@@ -1,13 +1,13 @@
 from Harris_Corner_Detector import detect_corners
 import cv2
-import numpy as np
 import PySimpleGUI as sg
 
 """
+----------------------------------------------------------------------------------------------------------------------
 Yuval Levi & Ortal Michael
 @HIT | Algorithms in multimedia and machine learning in the Python environment - Yakir Menahem
 Spring 2021
-
+----------------------------------------------------------------------------------------------------------------------
 
 --- Harris corner detection implementation ---
 
@@ -19,13 +19,22 @@ Theoretical step: [For each pixel (i,j) define the matrix M]
 4. Compute the score R
 5. Threshold R and perform NMS (non-maxima suppression)
 
+----------------------------------------------------------------------------------------------------------------------
 
-Run the program:
-- Load an image using "browse"
-- Choose desired sensitivity level (low/medium/high) [default: medium]
-- Click "show corners" to present results
-- You can switch sensitivities at each point, the results will be updated only after re-clicking "show corners"
+Run instructions:
+
+1. Prerequisite - first use
+    Install required packages:
+    pip install -r requirements.txt
+    (OpenCV and Anaconda packages are also required)
+
+2. Run the software: 
+    - Load an image using "browse"
+    - Choose desired sensitivity level (low/medium/high) [default: medium]
+    - Click "show corners" to present results
+    - You can switch sensitivities at each point, the results will be updated only after re-clicking "show corners"
  
+----------------------------------------------------------------------------------------------------------------------
 """
 
 if __name__ == '__main__':
@@ -97,10 +106,11 @@ if __name__ == '__main__':
                 window["-IMAGE-"].update(data=img_bytes)
             except:
                 pass
-        # Event - show corners button
+
+        # Event - show corners button was pressed
         elif event == "-SHOW-":
             try:
-                # Check which sensitivity radio is chosen
+                # Check which sensitivity (radio) is chosen
                 if values["-LOW-"]:
                     th_params = low_sen_params
                 elif values["-MEDIUM-"]:
@@ -108,6 +118,7 @@ if __name__ == '__main__':
                 elif values["-HIGH-"]:
                     th_params = high_sen_params
 
+                # Read image, detect corners according to chosen sensitivity and show results
                 filename = values["-FOLDER-"]
                 img = cv2.imread(filename)
                 img_corners = detect_corners(img, **th_params)
