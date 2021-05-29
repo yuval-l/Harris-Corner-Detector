@@ -14,9 +14,9 @@ Spring 2021
 
 Algorithm steps:
 1. Compute image gradients: Gx,Gy
-2. Compute Compute 2nd order moments: Gx*Gx, Gx*Gy, Gy*Gy
+2. Compute 2nd order moments: Gx*Gx, Gx*Gy, Gy*Gy
 3. Filter products with a Gaussian window
-Theoretical step: [For each pixel (i,j) define the matrix M]
+--- Theoretical step: [For each pixel (i,j) define the matrix M]
 4. Compute the score R
 5. Threshold R and perform NMS (non-maxima suppression)
 
@@ -38,20 +38,52 @@ def compute_img_gradients(image):
     return Gx, Gy
 
 
-def compute_products(Gx, Gy, k):
+def compute_2nd_order_products(Gx, Gy):
     """
-    1. Computes 2nd order moments: Gx*Gx, Gx*Gy, Gy*Gy
-    2. Filter products with Gaussian window
+    Computes 2nd order moments: Gx*Gx, Gx*Gy, Gy*Gy
     :param Gx: Gradient by x axis
     :param Gy: Gradient by y axis
-    :param k: size of window (kxk) to use in the filter (neighborhood area to check the gradients)
+    :return: 2nd order moments Gx^2, Gy^2, Gx*Gy
+    """
+    Gx_2 = Gx**2
+    Gy_2 = Gy**2
+    GxGy = Gx * Gy
+
+    return Gx_2, Gy_2, GxGy
+
+
+def linear_filter_products(Gx_2, Gy_2, GxGy, k):
+    """
+    Filter 2nd order moments: (Gx*Gx, Gx*Gy, Gy*Gy) with Gaussian window
+    :param Gx_2: Second order product: Gx^2
+    :param Gy_2: Second order product: Gy^2
+    :param GxGy: Second order product: Gx*Gy
+    :param k: size of window (k x k) to use in the filter (neighborhood area to check the gradients)
     :return: the filtered 2nd order moments
     """
+    m11 = cv2.GaussianBlur(Gx_2, (k, k), 0)
+    m22 = cv2.GaussianBlur(Gy_2, (k, k), 0)
+    m12 = cv2.GaussianBlur(GxGy, (k, k), 0)
 
-    m11 = cv2.GaussianBlur(Gx**2, (k, k), 0)
-    m22 = cv2.GaussianBlur(Gy**2, (k, k), 0)
-    m12 = cv2.GaussianBlur(Gx*Gy, (k, k), 0)
     return m11, m22, m12
+
+
+def calc_score_R(m11, m12, m22):
+    """
+    calculate score R for image:
+    R >> 0 : corner
+    R ~ 0 : flat
+    R << 0: edge
+    :param m11: moments matrix (Gx^2)
+    :param m12: moments matrix (Gx*Gy)
+    :param m22: moments matrix (Gy^2)
+    :return: score R matrix
+    """
+    traceM = m11 + m22
+    detM = m11 * m22 - m12 ** 2
+    R = detM - 0.06 * (traceM ** 2)
+
+    return R
 
 
 def R_threshold(R, th_ratio):
@@ -66,6 +98,21 @@ def R_threshold(R, th_ratio):
     return R_th
 
 
+def threshold_and_nms(R, th_ratio):
+    """
+    Threshold R-score image and perform NMS
+    :param R: Harris score R original image
+    :param th_ratio: the ratio to R-score image maximum value to use in order to threshold the image
+    :return: Score R image after threshold and NMS (represents location of corners)
+    """
+    R_th = R_threshold(R, th_ratio)  # threshold
+    R_dilate = cv2.dilate(R, np.ones((3, 3)))  # NMS
+    R_nms = R >= R_dilate  # NMS
+    R_final = R_th * R_nms  # Result after threshold and NMS
+
+    return R_final
+
+
 def detect_corners(img, **params):
     """
     The main corner detection function
@@ -73,32 +120,30 @@ def detect_corners(img, **params):
     :param params: dictionary with 3 parameters of the chosen sensitivity
             -  params['filter_size']: the size of the Gaussian window (neighborhood area to check the gradients)
             -  params['r_threshold']: the ratio to R-score image maximum value to use in order to threshold the image
-            -  params['k_nms']: the kernel size to use for the NMS
     :return: RGB image with the corners found marked on it
     """
 
     try:
+        # Convert to Grayscale image to use for the algorithm
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # Step 1: Compute image gradients: Gx,Gy
         Gx, Gy = compute_img_gradients(img_gray)
 
-        # Steps 2+3: Gaussian filter on 2nd order moments
-        m11, m22, m12 = compute_products(Gx, Gy, params['filter_size'])
+        # Steps 2: Compute 2nd order moments: Gx*Gx, Gx*Gy, Gy*Gy
+        Gx_2, Gy_2, GxGy = compute_2nd_order_products(Gx, Gy)
 
-        # Step 4: Score R:   det(M) - a * trace(M)^2
-        traceM = m11 + m22
-        detM = m11*m22-m12**2
-        R = detM - 0.06 * (traceM**2)
+        # Step 3: Gaussian filter on 2nd order moments
+        m11, m22, m12 = linear_filter_products(Gx_2, Gy_2, GxGy, params['filter_size'])
+
+        # Step 4: Calculate score R:   det(M) - a * trace(M)^2
+        R = calc_score_R(m11, m12, m22)
 
         # Step 5: Threshold R and NMS
-        R_th = R_threshold(R, params['r_threshold'])  # threshold
-        R_dilate = cv2.dilate(R, np.ones((params['k_nms'], params['k_nms']))) #NMS
-        R_nms = R >= R_dilate  # NMS
-        R_final = R_th * R_nms  # Result after threshold and NMS
+        R_final_score = threshold_and_nms(R, params['r_threshold'])
 
-        # Draw found corners on colored image
-        [y, x] = np.nonzero(R_final)
+        # Mark found corners on colored image
+        [y, x] = np.nonzero(R_final_score)
         for corner_y, corner_x in zip(y, x):
             cv2.circle(img, (corner_x, corner_y), 3, (0, 0, 255), -1)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
