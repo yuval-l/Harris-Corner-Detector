@@ -48,17 +48,14 @@ if __name__ == '__main__':
     low_sen_params = {
         'r_threshold': 0.1,
         'filter_size': 3,
-        'k_nms': 13
     }
     medium_sen_params = {
         'r_threshold': 0.05,
         'filter_size': 7,
-        'k_nms': 9
     }
     high_sen_params = {
         'r_threshold': 0.001,
         'filter_size': 11,
-        'k_nms': 5
     }
 
     # GUI - define control panel - load image, set sensitivity, show corners
