@@ -46,15 +46,15 @@ if __name__ == '__main__':
 
     # Dicts defining low/medium/high sensitivities thresholds
     low_sen_params = {
-        'r_threshold': 0.1,
+        'r_threshold_ratio': 0.1,
         'filter_size': 3,
     }
     medium_sen_params = {
-        'r_threshold': 0.05,
+        'r_threshold_ratio': 0.05,
         'filter_size': 7,
     }
     high_sen_params = {
-        'r_threshold': 0.001,
+        'r_threshold_ratio': 0.001,
         'filter_size': 11,
     }
 

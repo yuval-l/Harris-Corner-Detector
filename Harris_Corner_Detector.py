@@ -140,7 +140,7 @@ def detect_corners(img, **params):
         R = calc_score_R(m11, m12, m22)
 
         # Step 5: Threshold R and NMS
-        R_final_score = threshold_and_nms(R, params['r_threshold'])
+        R_final_score = threshold_and_nms(R, params['r_threshold_ratio'])
 
         # Mark found corners on colored image
         [y, x] = np.nonzero(R_final_score)
